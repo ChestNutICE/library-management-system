@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "运行图书管理系统",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}\\main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "justMyCode": true
+    }
+  ]
+}

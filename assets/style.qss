@@ -1,0 +1,42 @@
+QWidget {
+    font-family: "Microsoft YaHei";
+    font-size: 14px;
+    color: #18324a;
+    background: #f7f9fc;
+}
+
+QLineEdit {
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid #afc0ce;
+    border-radius: 8px;
+    background: white;
+}
+
+QLineEdit:focus {
+    border: 2px solid #2e74b5;
+}
+
+QPushButton {
+    min-height: 42px;
+    border: none;
+    border-radius: 8px;
+    background: #2e74b5;
+    color: white;
+    font-weight: bold;
+}
+
+QPushButton:hover {
+    background: #245f95;
+}
+
+QLabel#pageTitle {
+    font-size: 28px;
+    font-weight: bold;
+    color: #18324a;
+}
+
+QLabel#hint {
+    font-size: 12px;
+    color: #607386;
+}
