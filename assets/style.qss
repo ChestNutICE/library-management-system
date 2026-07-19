@@ -30,6 +30,49 @@ QPushButton:hover {
     background: #245f95;
 }
 
+QPushButton:pressed {
+    background: #1d4f7d;
+}
+
+QPushButton:disabled {
+    background: #a9b7c4;
+}
+
+QComboBox, QSpinBox {
+    min-height: 38px;
+    padding: 0 10px;
+    border: 1px solid #afc0ce;
+    border-radius: 8px;
+    background: white;
+}
+
+QTableWidget {
+    gridline-color: #dce5ed;
+    background: white;
+    alternate-background-color: #f1f6fa;
+    selection-background-color: #cfe5f8;
+    selection-color: #18324a;
+}
+
+QHeaderView::section {
+    padding: 9px;
+    border: none;
+    border-bottom: 1px solid #afc0ce;
+    background: #e8f0f7;
+    font-weight: bold;
+}
+
+QTabBar::tab {
+    min-width: 90px;
+    padding: 10px 14px;
+    background: #e8f0f7;
+}
+
+QTabBar::tab:selected {
+    color: #ffffff;
+    background: #2e74b5;
+}
+
 QLabel#pageTitle {
     font-size: 28px;
     font-weight: bold;

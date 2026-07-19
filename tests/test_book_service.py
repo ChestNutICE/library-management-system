@@ -1,9 +1,11 @@
 import sqlite3
+from uuid import uuid4
 
 import pytest
 
 import database.db as db_module
 from database.init_db import initialize_database
+from utils.paths import DATA_DIR
 from services.book_service import (
     add_book,
     deactivate_book,
@@ -14,11 +16,13 @@ from services.book_service import (
 
 
 @pytest.fixture()
-def isolated_database(tmp_path, monkeypatch):
-    database_file = tmp_path / "test_library.db"
+def isolated_database(monkeypatch):
+    # 避开某些 Windows 环境中无访问权限的 pytest 系统临时目录。
+    database_file = DATA_DIR / f"test-library-{uuid4().hex}.db"
     monkeypatch.setattr(db_module, "DATABASE_FILE", database_file)
     initialize_database()
-    return database_file
+    yield database_file
+    database_file.unlink(missing_ok=True)
 
 
 def test_database_initialization_is_idempotent(isolated_database) -> None:

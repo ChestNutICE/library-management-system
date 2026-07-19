@@ -7,5 +7,7 @@ build/
 dist/
 *.spec
 data/*.db
+data/test-library-*.db
 outputs/
 work/
+.test-temp/
