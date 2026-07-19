@@ -9,6 +9,7 @@ ACTIONS = (
     ("全部操作", "all"), ("新增图书", "book.add"), ("修改图书", "book.update"),
     ("停用图书", "book.deactivate"), ("新增读者", "reader.add"),
     ("修改读者", "reader.update"), ("停用读者", "reader.deactivate"),
+    ("重置读者密码", "reader.reset_password"),
     ("办理借书", "loan.borrow"), ("办理还书", "loan.return"),
 )
 ACTION_TEXT = dict((value, text) for text, value in ACTIONS)

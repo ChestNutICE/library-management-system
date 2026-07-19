@@ -95,6 +95,28 @@ def return_book(loan_id: int, return_date: date | None = None,
         return fine
 
 
+def renew_loan(loan_id: int, operator_id: int | None = None,
+               current_date: date | None = None) -> str:
+    """未逾期借阅可续借一次，期限从原应还日延长 30 天。"""
+    check_date = current_date or today()
+    with transaction() as connection:
+        _refresh_overdue(connection, check_date)
+        loan = connection.execute(
+            "SELECT due_date,status,renew_count FROM loans WHERE id=?", (loan_id,)
+        ).fetchone()
+        if loan is None: raise ValueError("借阅记录不存在")
+        if loan["status"] == "returned": raise ValueError("已归还记录不能续借")
+        if loan["status"] == "overdue": raise ValueError("逾期图书不能续借")
+        if loan["renew_count"] >= 1: raise ValueError("每条借阅记录只能续借一次")
+        new_due = default_due_date(date.fromisoformat(loan["due_date"]))
+        connection.execute(
+            "UPDATE loans SET due_date=?,renew_count=renew_count+1 WHERE id=?",
+            (new_due.isoformat(), loan_id),
+        )
+        write_log(connection, operator_id, "loan.renew", f"续借记录 ID：{loan_id}，新应还日：{new_due.isoformat()}")
+        return new_due.isoformat()
+
+
 def list_loans(keyword: str = "", status: str = "all", user_id: int | None = None,
                current_date: date | None = None) -> list[dict]:
     with transaction() as connection:
@@ -112,9 +134,9 @@ def list_loans(keyword: str = "", status: str = "all", user_id: int | None = Non
     connection = get_connection()
     try:
         rows = connection.execute(
-            f"""SELECT l.id, l.user_id, l.book_id, u.username, u.real_name,
+                f"""SELECT l.id, l.user_id, l.book_id, u.username, u.real_name, u.phone,
                        b.isbn, b.title, l.borrow_date, l.due_date,
-                       l.return_date, l.status, l.fine
+                       l.return_date, l.status, l.fine, l.renew_count
                 FROM loans l JOIN users u ON u.id = l.user_id
                 JOIN books b ON b.id = l.book_id
                 {where} ORDER BY l.id DESC""",

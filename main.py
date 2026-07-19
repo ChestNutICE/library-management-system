@@ -5,6 +5,7 @@ import sys
 from PySide6.QtWidgets import QApplication
 
 from database.init_db import initialize_database
+from services.backup_service import create_daily_backup_if_needed
 from utils.paths import asset_path
 from views.login_window import LoginWindow
 
@@ -17,6 +18,11 @@ def load_stylesheet(app: QApplication) -> None:
 
 def main() -> int:
     initialize_database()
+    try:
+        create_daily_backup_if_needed()
+    except (OSError, ValueError):
+        # 自动备份失败不应阻止用户启动；管理员仍可在数据维护页手动备份。
+        pass
     app = QApplication(sys.argv)
     app.setApplicationName("图书管理系统")
     load_stylesheet(app)

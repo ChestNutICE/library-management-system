@@ -77,6 +77,33 @@ def update_reader(reader_id: int, *, real_name: str, phone: str = "", operator_i
         write_log(connection, operator_id, "reader.update", f"修改读者 ID：{reader_id}，姓名：{clean_name}")
 
 
+def reset_reader_password(reader_id: int, new_password: str,
+                          operator_id: int | None = None) -> None:
+    """由管理员为读者设置新的临时密码。"""
+    if len(new_password) < 6:
+        raise ValueError("新密码至少需要 6 位")
+    with transaction() as connection:
+        operator = connection.execute(
+            "SELECT role, status FROM users WHERE id = ?", (operator_id,)
+        ).fetchone()
+        if operator is None or operator["role"] != "admin" or operator["status"] != 1:
+            raise PermissionError("只有有效管理员可以重置读者密码")
+        reader = connection.execute(
+            "SELECT username FROM users WHERE id = ? AND role = 'reader'",
+            (reader_id,),
+        ).fetchone()
+        if reader is None:
+            raise ValueError("读者不存在")
+        connection.execute(
+            "UPDATE users SET password_hash = ? WHERE id = ?",
+            (hash_password(new_password), reader_id),
+        )
+        write_log(
+            connection, operator_id, "reader.reset_password",
+            f"重置读者密码：{reader['username']}（ID：{reader_id}）",
+        )
+
+
 def deactivate_reader(reader_id: int, operator_id: int | None = None) -> None:
     with transaction() as connection:
         active_loans = connection.execute(
@@ -93,3 +120,12 @@ def deactivate_reader(reader_id: int, operator_id: int | None = None) -> None:
         if cursor.rowcount == 0:
             raise ValueError("读者不存在")
         write_log(connection, operator_id, "reader.deactivate", f"停用读者 ID：{reader_id}")
+
+
+def activate_reader(reader_id: int, operator_id: int | None = None) -> None:
+    with transaction() as connection:
+        cursor = connection.execute(
+            "UPDATE users SET status = 1 WHERE id = ? AND role = 'reader'", (reader_id,)
+        )
+        if cursor.rowcount == 0: raise ValueError("读者不存在")
+        write_log(connection, operator_id, "reader.activate", f"启用读者 ID：{reader_id}")

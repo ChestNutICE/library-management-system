@@ -8,6 +8,8 @@ dist/
 *.spec
 data/*.db
 data/test-library-*.db
+data/covers/
+backups/
 outputs/
 work/
 .test-temp/

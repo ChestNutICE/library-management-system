@@ -50,3 +50,12 @@ def restore_backup(backup_file: Path) -> Path:
     if not verify_database(DATABASE_FILE):
         raise ValueError("恢复后的数据库校验失败，请使用自动安全备份恢复")
     return safety_backup
+
+
+def create_daily_backup_if_needed() -> Path | None:
+    """每天首次启动时自动备份一次。"""
+    BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    prefix = f"library-{datetime.now():%Y%m%d}-"
+    if any(path.name.startswith(prefix) for path in BACKUP_DIR.glob("library-*.db")):
+        return None
+    return create_backup()
